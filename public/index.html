@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Biblioteca</title>
+    <style>
+        /* Estilos (CSS) */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f6f9;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+        }
+        .form-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        input {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            flex: 1;
+            min-width: 150px;
+        }
+        button {
+            padding: 10px 20px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #2c3e50;
+            color: white;
+        }
+        .btn-excluir {
+            background-color: #e74c3c;
+            padding: 5px 10px;
+            font-size: 14px;
+        }
+        .btn-excluir:hover {
+            background-color: #c0392b;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>📚 Gerenciamento de Biblioteca</h1>
+        
+        <!-- Formulário de Cadastro -->
+        <div class="form-group">
+            <input type="text" id="titulo" placeholder="Título do Livro">
+            <input type="text" id="autor" placeholder="Autor">
+            <input type="text" id="categoria" placeholder="Categoria">
+            <input type="number" id="quantidade" placeholder="Qtd" value="1" min="1" style="max-width: 80px;">
+            <button onclick="cadastrarLivro()">Cadastrar</button>
+        </div>
+
+        <!-- Tabela de Livros -->
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Título</th>
+                    <th>Autor</th>
+                    <th>Categoria</th>
+                    <th>Disponíveis</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody id="tabela-livros">
+                <!-- Os livros vão aparecer aqui automaticamente -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        // 1. Função para buscar os livros no back-end e mostrar na tabela
+        async function carregarLivros() {
+            try {
+                const resposta = await fetch('/livros');
+                const livros = await resposta.json();
+                
+                const tabela = document.getElementById('tabela-livros');
+                tabela.innerHTML = ''; // Limpa a tabela antes de preencher
+
+                livros.forEach(livro => {
+                    const linha = document.createElement('tr');
+                    linha.innerHTML = `
+                        <td>${livro.id}</td>
+                        <td>${livro.titulo}</td>
+                        <td>${livro.autor}</td>
+                        <td>${livro.categoria}</td>
+                        <td>${livro.quantidade_disponivel} / ${livro.quantidade_total}</td>
+                        <td>
+                            <button class="btn-excluir" onclick="excluirLivro(${livro.id})">Excluir</button>
+                        </td>
+                    `;
+                    tabela.appendChild(linha);
+                });
+            } catch (erro) {
+                console.error("Erro ao carregar livros:", erro);
+            }
+        }
+
+        // 2. Função para cadastrar um novo livro
+        async function cadastrarLivro() {
+            const titulo = document.getElementById('titulo').value;
+            const autor = document.getElementById('autor').value;
+            const categoria = document.getElementById('categoria').value;
+            const quantidade = document.getElementById('quantidade').value;
+
+            if (!titulo || !autor) {
+                alert("Título e Autor são obrigatórios!");
+                return;
+            }
+
+            // Envia os dados para a API
+            await fetch('/livros', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    titulo: titulo,
+                    autor: autor,
+                    categoria: categoria,
+                    quantidade_total: Number(quantidade)
+                })
+            });
+
+            // Limpa os campos e atualiza a tabela
+            document.getElementById('titulo').value = '';
+            document.getElementById('autor').value = '';
+            document.getElementById('categoria').value = '';
+            document.getElementById('quantidade').value = '1';
+            carregarLivros(); 
+        }
+
+        // 3. Função para excluir um livro
+        async function excluirLivro(id) {
+            if (confirm("Tem certeza que deseja excluir este livro?")) {
+                await fetch(`/livros/${id}`, { method: 'DELETE' });
+                carregarLivros(); // Atualiza a tabela
+            }
+        }
+
+        // Roda a função de carregar livros assim que a página abrir
+        carregarLivros();
+    </script>
+</body>
+</html>
