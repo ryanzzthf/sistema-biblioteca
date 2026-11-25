@@ -7,6 +7,8 @@ Aplicação web para gerenciamento de uma biblioteca, permitindo o cadastro de l
 
 ## 🚀 Tecnologias Utilizadas
 - **Node.js** e **Express.js** (Back-end)
+- **PostgreSQL** (Banco de Dados relacional)
+- **PG Admin** (Ferramenta de gerenciamento do banco)
 - **JavaScript**, **HTML5** e **CSS3** (Front-end)
 - **Git** e **GitHub** (Versionamento)
 
@@ -30,5 +32,5 @@ Aplicação web para gerenciamento de uma biblioteca, permitindo o cadastro de l
 - `PUT /emprestimos/:id/devolucao` - Registra a devolução de um livro
 
 ## 👥 Integrantes
-- [Seu Nome Completo - Ex: Ryan Melo Emidio]
-- [Nome do seu Colega de Dupla]
+- [Ryan Melo Emidio]
+- [Evellyn Pedroza dos Santos]
